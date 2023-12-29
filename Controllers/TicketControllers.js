@@ -21,8 +21,18 @@ export const postTicket = async (req, res , next) => {
 
 export const getAllTicket = async (req, res, next) => {
     try {
-      const tickets = await Invoice.find();
+      const tickets = await TicketModel.find();
       res.status(200).json({ tickets });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  };
+  export const getLastTicketNumber = async (req, res, next) => {
+    try {
+      const lastTicket = await TicketModel.findOne().sort({ issueId: -1 }).limit(1);
+      const lastTicketNumber = lastTicket ? lastTicket.issueId : 0;
+      res.status(200).json({ lastTicketNumber });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });
