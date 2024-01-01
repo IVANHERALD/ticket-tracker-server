@@ -38,3 +38,59 @@ export const getAllTicket = async (req, res, next) => {
       res.status(500).json({ error: "Internal Server Error" });
     }
   };
+  
+export const getTicketById = async (req, res, next) => {
+
+  const id = req.query._id;
+  if(!id)
+  {
+    return res.status(400).json({message:'Missing query parameter: id'});
+  }
+  try {
+    const Ticket = await TicketModel.findById(id);
+    res.status(200).json({ Ticket });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+export const updateTicket = async(req,res,next) =>{
+  const id = req.query._id; 
+  try {
+    const updatedTicket = req.body; 
+    if (!id) {
+      console.log(id)
+      return res.status(400).json({ message: 'Ticket ID is required for updating.' });
+    }
+
+    const existingTicket = await TicketModel.findById(id);
+    if (!existingTicket) {
+      return res.status(404).json({ message: 'Ticket not found.' });
+    }
+    const updated = await TicketModel.findByIdAndUpdate(id, updatedTicket, { new: true });
+    return res.status(200).json({ message: 'Ticket updated successfully.', updated });
+  } catch (error) {
+    console.error('Error updating Ticket:', error);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+export const deleteTicket = async (req, res, next) => {
+  const id = req.query._id;
+
+  try {
+    if (!id) {
+      return res.status(400).json({ message: 'Ticket ID is required for deletion.' });
+    }
+
+    const existingTicket = await TicketModel.findById(id);
+    if (!existingTicket) {
+      return res.status(404).json({ message: 'Ticket not found.' });
+    }
+
+    await TicketModel.findByIdAndDelete(id);
+    return res.status(200).json({ message: 'Ticket deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting Ticket:', error);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
